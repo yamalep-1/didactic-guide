@@ -1,0 +1,44 @@
+#include <gtest/gtest.h>
+#include "triangle.h"
+
+TEST(TriangleTest, SimpleConditions) {
+    Triangle t(3, 4, 5);
+    EXPECT_NEAR(t.Area(), 6.0, 1e-5);
+
+    EXPECT_THROW(Triangle(-1, 2, 3), std::invalid_argument);
+    EXPECT_THROW(Triangle(1, 2, 3), std::invalid_argument);
+    EXPECT_THROW(Triangle(1, 1, 2), std::invalid_argument);
+}
+TEST(TriangleTest, StringConditions) {
+    Triangle t(5, 12, 13);
+    EXPECT_NEAR(t.Area(), 30.0, 1e-5);
+
+    try {
+        Triangle(-3, 4, 5);
+    } catch (const std::invalid_argument& e) {
+        EXPECT_STREQ(e.what(), "Sides must be positive");
+    }
+
+    try {
+        Triangle(1, 2, 3);
+    } catch (const std::invalid_argument& e) {
+        EXPECT_STREQ(e.what(), "Sides do not form a triangle");
+    }
+}
+TEST(TriangleTest, CollectionConditions) {
+    std::vector<Triangle> triangles = {
+        Triangle(3, 4, 5),
+        Triangle(5, 12, 13),
+        Triangle(7, 24, 25)
+    };
+
+    std::vector<double> expected_areas = {6.0, 30.0, 84.0};
+    for (size_t i = 0; i < triangles.size(); ++i) {
+        EXPECT_NEAR(triangles[i].Area(), expected_areas[i], 1e-5);
+    }
+}
+
+int main(int argc, char **argv) {
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+};
