@@ -1,0 +1,35 @@
+#include <string>
+#include <stdexcept>
+#include <algorithm>
+
+class StringFormatter {
+public:
+    static std::string SafeString(const std::string& s) {
+        if (s.empty()) {
+            return "";
+        }
+        if (s == nullptr) {
+            throw std::invalid_argument("String cannot be null");
+        }
+
+        std::string result;
+        result.reserve(s.size());
+        for (char c : s) {
+            if (c == '\'') {
+                result += "''";
+            } else {
+                result += c;
+            }
+        }
+        std::string keywords[] = {"select", "insert", "update", "delete"};
+        for (const std::string& keyword : keywords) {
+            size_t pos = 0;
+            while ((pos = result.find(keyword, pos)) != std::string::npos) {
+                result.replace(pos, keyword.length(), keyword.length(), std::toupper(keyword[0]));
+                pos += keyword.length();
+            }
+        }
+
+        return result;
+    }
+};
