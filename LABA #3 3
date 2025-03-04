@@ -1,0 +1,18 @@
+#include <vector>
+#include <algorithm>
+#include <set>
+
+class ArrayProcessor {
+public:
+    static std::vector<double> SortAndFilter(const std::vector<double>& a) {
+        std::vector<double> result;
+        for (double num : a) {
+            result.push_back(std::abs(num));
+        }
+        std::set<double> unique_elements(result.begin(), result.end());
+        result.assign(unique_elements.begin(), unique_elements.end());
+        std::sort(result.begin(), result.end(), std::greater<double>());
+
+        return result;
+    }
+};
