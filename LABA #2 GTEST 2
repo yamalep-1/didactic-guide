@@ -1,0 +1,42 @@
+#include <gtest/gtest.h>
+#include "string_formatter.h"
+TEST(StringFormatterTest, SimpleConditions) {
+    EXPECT_EQ(StringFormatter::SafeString("select * from table"), "SELECT * from table");
+    EXPECT_EQ(StringFormatter::SafeString("O'Brien"), "O''Brien");
+    EXPECT_EQ(StringFormatter::SafeString(""), "");
+    EXPECT_THROW(StringFormatter::SafeString(nullptr), std::invalid_argument);
+}
+TEST(StringFormatterTest, StringConditions) {
+    EXPECT_EQ(StringFormatter::SafeString("insert into table"), "INSERT into table");
+    EXPECT_EQ(StringFormatter::SafeString("delete from table where id = 1"), "DELETE from table where id = 1");
+    EXPECT_EQ(StringFormatter::SafeString("update table set value = 'abc'"), "UPDATE table set value = ''abc''");
+try {
+        StringFormatter::SafeString(nullptr);
+    } catch (const std::invalid_argument& e) {
+        EXPECT_STREQ(e.what(), "String cannot be null");
+    }
+}
+TEST(StringFormatterTest, CollectionConditions) {
+    std::vector<std::string> inputs = {
+        "select name from users",
+        "insert into users values (1, 'John')",
+        "update users set name = 'Jane' where id = 1",
+        "delete from users where id = 1"
+    };
+
+    std::vector<std::string> expected_outputs = {
+        "SELECT name from users",
+        "INSERT into users values (1, ''John'')",
+        "UPDATE users set name = ''Jane'' where id = 1",
+        "DELETE from users where id = 1"
+    };
+
+    for (size_t i = 0; i < inputs.size(); ++i) {
+        EXPECT_EQ(StringFormatter::SafeString(inputs[i]), expected_outputs[i]);
+    }
+}
+
+int main(int argc, char **argv) {
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+};
